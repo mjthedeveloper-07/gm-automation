@@ -94,6 +94,11 @@
   to = "/.netlify/functions/repurpose-content"
   status = 200
 
+[[redirects]]
+  from = "/api/webhook/instagram"
+  to = "/.netlify/functions/webhook-instagram"
+  status = 200
+
 # ── SPA fallback ──────────────────────────────────────────────────────────────
 [[redirects]]
   from = "/*"
