@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
+import { toBlob } from 'html-to-image'
+import { supabase } from '../lib/supabase'
 import {
   Layers, Sparkles, ChevronLeft, ChevronRight,
   Plus, Trash2, Download, Send, Loader2, Palette
@@ -86,6 +88,7 @@ export default function CarouselBuilder() {
   const [brandColor, setBrandColor] = useState('#0ea5e9')
   const [slides, setSlides] = useState<CarouselSlide[]>([])
   const [activeSlide, setActiveSlide] = useState(0)
+  const [isPublishing, setIsPublishing] = useState(false)
   const canvasRef = useRef<HTMLDivElement>(null)
 
   const generateMutation = useMutation({
@@ -100,8 +103,14 @@ export default function CarouselBuilder() {
 
   const publishMutation = useMutation({
     mutationFn: api.publishPost,
-    onSuccess: () => addNotification('success', 'Carousel published to Instagram!'),
-    onError: (e: Error) => addNotification('error', e.message),
+    onSuccess: () => {
+      addNotification('success', 'Carousel published to Instagram!')
+      setIsPublishing(false)
+    },
+    onError: (e: Error) => {
+      addNotification('error', e.message)
+      setIsPublishing(false)
+    },
   })
 
   const currentSlide = slides[activeSlide]
@@ -139,6 +148,67 @@ export default function CarouselBuilder() {
     a.download = `carousel-${Date.now()}.json`
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  const handlePublish = async () => {
+    if (slides.length === 0) return
+    setIsPublishing(true)
+
+    try {
+      const mediaUrls: string[] = []
+      
+      addNotification('info', 'Generating high-res carousel images...')
+      
+      // Render and upload sequentially
+      for (let i = 0; i < slides.length; i++) {
+        const node = document.getElementById(`slide-export-${i}`)
+        if (!node) continue
+        
+        // Target 1080px resolution for Instagram quality
+        const pixelRatio = 1080 / node.offsetWidth
+        const blob = await toBlob(node, {
+          quality: 1,
+          pixelRatio,
+          cacheBust: true
+        })
+        
+        if (!blob) throw new Error(`Failed to generate image for slide ${i+1}`)
+        
+        const fileName = `carousel_${Date.now()}_slide_${i+1}.png`
+        addNotification('info', `Uploading slide ${i+1} of ${slides.length}...`)
+        
+        const { data, error } = await supabase.storage
+          .from('carousel_assets')
+          .upload(fileName, blob, { contentType: 'image/png' })
+          
+        if (error) throw error
+        
+        const { data: publicUrlData } = supabase.storage
+          .from('carousel_assets')
+          .getPublicUrl(fileName)
+          
+        mediaUrls.push(publicUrlData.publicUrl)
+      }
+      
+      addNotification('info', 'Publishing carousel to Instagram! This may take a moment...')
+      
+      // Create a professional enthusiast caption using the content from the slides
+      const combinedCaption = `🚀 ${topic}\n\n` + 
+        slides.map((s, idx) => `${idx + 1}. ${s.headline}`).join('\n') +
+        `\n\nFollow for more daily value! 🔥\n#automation #software #tech`
+
+      publishMutation.mutate({
+        platform: 'instagram',
+        content: combinedCaption, // the fallback core text
+        caption: combinedCaption, // the actual instagram caption
+        post_type: 'carousel',
+        media_urls: mediaUrls
+      })
+
+    } catch (err: any) {
+      addNotification('error', err.message || 'Export failed')
+      setIsPublishing(false)
+    }
   }
 
   // Update canvas mock whenever active slide changes
@@ -269,14 +339,10 @@ export default function CarouselBuilder() {
               </button>
               <button
                 className="btn-primary w-full flex items-center justify-center gap-2"
-                disabled={publishMutation.isPending}
-                onClick={() => publishMutation.mutate({
-                  platform: 'instagram',
-                  content: slides.map((s) => s.headline).join('\n'),
-                  post_type: 'carousel',
-                })}
+                disabled={isPublishing || publishMutation.isPending}
+                onClick={handlePublish}
               >
-                {publishMutation.isPending
+                {isPublishing || publishMutation.isPending
                   ? <Loader2 className="w-4 h-4 animate-spin" />
                   : <Send className="w-4 h-4" />
                 }
@@ -399,6 +465,15 @@ export default function CarouselBuilder() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Hidden Export Container */}
+      <div style={{ position: 'absolute', top: '-9999px', left: '-9999px', pointerEvents: 'none', opacity: 0 }}>
+        {slides.map((slide, i) => (
+          <div key={i} id={`slide-export-${i}`} style={{ width: '400px' }}>
+            <SlidePreview slide={slide} template={selectedTemplate} />
+          </div>
+        ))}
       </div>
     </div>
   )
