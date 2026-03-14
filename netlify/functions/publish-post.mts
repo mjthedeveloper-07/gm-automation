@@ -22,51 +22,49 @@ async function publishInstagram(content: string, mediaUrls?: string[], caption?:
   }
 
   let containerId: string
+  const finalMediaUrls = mediaUrls && mediaUrls.length > 0 ? mediaUrls : [
+    // Fallback beautiful abstract gradient image for text-only posts
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1080&auto=format&fit=crop'
+  ]
 
-  if (mediaUrls && mediaUrls.length > 0) {
-    if (mediaUrls.length > 1) {
-      // Carousel: create individual containers first
-      const childIds: string[] = []
-      for (const imgUrl of mediaUrls) {
-        const childRes = await fetch(`${baseUrl}/${igUserId}/media`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image_url: imgUrl, is_carousel_item: true, access_token: accessToken }),
-        })
-        const childData = await childRes.json()
-        if (!childData.id) throw new Error('Failed to create carousel child container')
-        childIds.push(childData.id)
-      }
-
-      // Poll each child for FINISHED status
-      for (const childId of childIds) {
-        await pollContainerStatus(baseUrl, childId, accessToken)
-      }
-
-      // Create carousel container
-      const carouselRes = await fetch(`${baseUrl}/${igUserId}/media`, {
+  if (finalMediaUrls.length > 1) {
+    // Carousel: create individual containers first
+    const childIds: string[] = []
+    for (const imgUrl of finalMediaUrls) {
+      const childRes = await fetch(`${baseUrl}/${igUserId}/media`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ media_type: 'CAROUSEL', children: childIds.join(','), caption: postCaption, access_token: accessToken }),
+        body: JSON.stringify({ image_url: imgUrl, is_carousel_item: true, access_token: accessToken }),
       })
-      const carouselData = await carouselRes.json()
-      if (!carouselData.id) throw new Error('Failed to create carousel container')
-      containerId = carouselData.id
-    } else {
-      // Single image post
-      const mediaRes = await fetch(`${baseUrl}/${igUserId}/media`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image_url: mediaUrls[0], caption: postCaption, access_token: accessToken }),
-      })
-      const mediaData = await mediaRes.json()
-      if (!mediaData.id) throw new Error('Failed to create media container')
-      containerId = mediaData.id
+      const childData = await childRes.json()
+      if (!childData.id) throw new Error('Failed to create carousel child container')
+      childIds.push(childData.id)
     }
+
+    // Poll each child for FINISHED status
+    for (const childId of childIds) {
+      await pollContainerStatus(baseUrl, childId, accessToken)
+    }
+
+    // Create carousel container
+    const carouselRes = await fetch(`${baseUrl}/${igUserId}/media`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ media_type: 'CAROUSEL', children: childIds.join(','), caption: postCaption, access_token: accessToken }),
+    })
+    const carouselData = await carouselRes.json()
+    if (!carouselData.id) throw new Error('Failed to create carousel container')
+    containerId = carouselData.id
   } else {
-    // Text-only (requires media on Instagram, so we use a default approach)
-    // For text-only: create a reel or use Threads instead
-    throw new Error('Instagram requires at least one image URL. Try Threads for text-only posts.')
+    // Single image post (or fallback image)
+    const mediaRes = await fetch(`${baseUrl}/${igUserId}/media`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image_url: finalMediaUrls[0], caption: postCaption, access_token: accessToken }),
+    })
+    const mediaData = await mediaRes.json()
+    if (!mediaData.id) throw new Error('Failed to create media container')
+    containerId = mediaData.id
   }
 
   // Poll container status
@@ -132,7 +130,7 @@ async function publishLinkedIn(content: string) {
   })
   if (!res.ok) throw new Error(`LinkedIn API error: ${res.status}`)
   const id = res.headers.get('x-restli-id')
-  return id
+  return id || undefined
 }
 
 async function publishThreads(content: string) {
