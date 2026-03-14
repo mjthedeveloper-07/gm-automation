@@ -28,9 +28,8 @@ async function publishInstagram(content: string, mediaUrls?: string[], caption?:
   ]
 
   if (finalMediaUrls.length > 1) {
-    // Carousel: create individual containers first
-    const childIds: string[] = []
-    for (const imgUrl of finalMediaUrls) {
+    // Carousel: create individual containers first concurrently
+    const createPromises = finalMediaUrls.map(async (imgUrl) => {
       const childRes = await fetch(`${baseUrl}/${igUserId}/media`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -38,13 +37,13 @@ async function publishInstagram(content: string, mediaUrls?: string[], caption?:
       })
       const childData = await childRes.json()
       if (!childData.id) throw new Error('Failed to create carousel child container')
-      childIds.push(childData.id)
-    }
+      return childData.id
+    })
+    
+    const childIds: string[] = await Promise.all(createPromises)
 
-    // Poll each child for FINISHED status
-    for (const childId of childIds) {
-      await pollContainerStatus(baseUrl, childId, accessToken)
-    }
+    // Poll each child for FINISHED status concurrently
+    await Promise.all(childIds.map(childId => pollContainerStatus(baseUrl, childId, accessToken)))
 
     // Create carousel container
     const carouselRes = await fetch(`${baseUrl}/${igUserId}/media`, {
