@@ -1,0 +1,101 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[dev]
+  command = "npm run dev"
+  port = 8888
+  targetPort = 5173
+  functions = "netlify/functions"
+  autoLaunch = false
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["netlify/mcp-servers/**"]
+
+# ── Cron Jobs ──────────────────────────────────────────────────────────────────
+[functions."cron-queue-runner"]
+  schedule = "*/5 * * * *"
+
+[functions."cron-trend-fetch"]
+  schedule = "0 6 * * *"
+
+[functions."cron-analytics-sync"]
+  schedule = "0 * * * *"
+
+[functions."cron-daily-report"]
+  schedule = "0 9 * * *"
+
+[functions."cron-weekly-analysis"]
+  schedule = "0 8 * * 1"
+
+[functions."cron-token-refresh"]
+  schedule = "0 */6 * * *"
+
+# ── API Redirects ──────────────────────────────────────────────────────────────
+[[redirects]]
+  from = "/api/generate-post"
+  to = "/.netlify/functions/generate-post"
+  status = 200
+
+[[redirects]]
+  from = "/api/generate-caption"
+  to = "/.netlify/functions/generate-caption"
+  status = 200
+
+[[redirects]]
+  from = "/api/generate-carousel"
+  to = "/.netlify/functions/generate-carousel"
+  status = 200
+
+[[redirects]]
+  from = "/api/generate-hashtags"
+  to = "/.netlify/functions/generate-hashtags"
+  status = 200
+
+[[redirects]]
+  from = "/api/trending-hooks"
+  to = "/.netlify/functions/trending-hooks"
+  status = 200
+
+[[redirects]]
+  from = "/api/publish-post"
+  to = "/.netlify/functions/publish-post"
+  status = 200
+
+[[redirects]]
+  from = "/api/schedule-post"
+  to = "/.netlify/functions/schedule-post"
+  status = 200
+
+[[redirects]]
+  from = "/api/get-queue"
+  to = "/.netlify/functions/get-queue"
+  status = 200
+
+[[redirects]]
+  from = "/api/cancel-post"
+  to = "/.netlify/functions/cancel-post"
+  status = 200
+
+[[redirects]]
+  from = "/api/get-analytics"
+  to = "/.netlify/functions/get-analytics"
+  status = 200
+
+[[redirects]]
+  from = "/api/get-trends"
+  to = "/.netlify/functions/get-trends"
+  status = 200
+
+[[redirects]]
+  from = "/api/repurpose-content"
+  to = "/.netlify/functions/repurpose-content"
+  status = 200
+
+# ── SPA fallback ──────────────────────────────────────────────────────────────
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

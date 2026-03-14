@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --sidebar-width: 256px;
+  }
+
+  * {
+    @apply border-dark-700;
+  }
+
+  body {
+    @apply bg-dark-950 text-white font-sans antialiased;
+    background-image: radial-gradient(ellipse at top left, rgba(14, 165, 233, 0.04) 0%, transparent 50%),
+                      radial-gradient(ellipse at bottom right, rgba(168, 85, 247, 0.04) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-dark-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-dark-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-dark-500;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-dark-900 border border-dark-700 rounded-xl p-6 shadow-card;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-200 hover:border-brand-500/30 hover:shadow-brand;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-semibold px-4 py-2.5 rounded-lg transition-all duration-200 shadow-brand hover:shadow-brand active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
+  }
+
+  .btn-secondary {
+    @apply bg-dark-800 hover:bg-dark-700 border border-dark-600 hover:border-dark-500 text-white font-medium px-4 py-2.5 rounded-lg transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply text-dark-300 hover:text-white hover:bg-dark-800 px-3 py-2 rounded-lg transition-all duration-200 active:scale-95;
+  }
+
+  .btn-danger {
+    @apply bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 text-red-400 hover:text-red-300 font-medium px-3 py-2 rounded-lg transition-all duration-200 active:scale-95;
+  }
+
+  .input-field {
+    @apply bg-dark-800 border border-dark-600 focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 text-white placeholder-dark-400 rounded-lg px-3 py-2.5 w-full outline-none transition-all duration-200;
+  }
+
+  .label {
+    @apply text-sm font-medium text-dark-300 mb-1.5 block;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply badge bg-green-500/10 text-green-400 border border-green-500/20;
+  }
+
+  .badge-error {
+    @apply badge bg-red-500/10 text-red-400 border border-red-500/20;
+  }
+
+  .badge-warning {
+    @apply badge bg-yellow-500/10 text-yellow-400 border border-yellow-500/20;
+  }
+
+  .badge-info {
+    @apply badge bg-brand-500/10 text-brand-400 border border-brand-500/20;
+  }
+
+  .badge-purple {
+    @apply badge bg-purple-500/10 text-purple-400 border border-purple-500/20;
+  }
+
+  .tab-btn {
+    @apply px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200;
+  }
+
+  .tab-btn-active {
+    @apply tab-btn bg-brand-500/10 text-brand-400 border border-brand-500/30;
+  }
+
+  .tab-btn-inactive {
+    @apply tab-btn text-dark-400 hover:text-dark-200 hover:bg-dark-800;
+  }
+
+  .stat-card {
+    @apply card flex flex-col gap-1;
+  }
+
+  .neon-text {
+    @apply text-transparent bg-clip-text bg-neon-gradient;
+  }
+
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium w-full;
+  }
+
+  .sidebar-item-active {
+    @apply sidebar-item bg-brand-500/10 text-brand-400 border border-brand-500/20;
+  }
+
+  .sidebar-item-inactive {
+    @apply sidebar-item text-dark-400 hover:text-dark-100 hover:bg-dark-800;
+  }
+
+  .platform-icon {
+    @apply w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold;
+  }
+
+  .skeleton {
+    @apply animate-pulse bg-dark-700 rounded;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply text-transparent bg-clip-text bg-brand-gradient;
+  }
+
+  .border-gradient {
+    border-image: linear-gradient(135deg, #0ea5e9, #a855f7) 1;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
