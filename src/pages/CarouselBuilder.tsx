@@ -11,10 +11,12 @@ import { useAppStore } from '../store/appStore'
 import type { CarouselSlide } from '../types'
 
 const TEMPLATES = [
-  { id: 'minimal-dark', name: 'Minimal Dark', bg: '#0a0a0a', text: '#ffffff', accent: '#3b82f6' },
-  { id: 'neon-tech', name: 'Neon Tech', bg: '#050505', text: '#ffffff', accent: '#00f5ff' },
-  { id: 'gradient-purple', name: 'Gradient Purple', bg: 'linear-gradient(135deg,#1e1b4b,#4c1d95)', text: '#ffffff', accent: '#a855f7' },
-  { id: 'white-clean', name: 'White Clean', bg: '#ffffff', text: '#111827', accent: '#0ea5e9' },
+  { id: 'c1', name: 'Terminal Green', bg: '#000000', text: '#ffffff', accent: '#00e676' },
+  { id: 'c2', name: 'Off-white Editorial', bg: '#f4f1eb', text: '#0d0d0d', accent: '#0d0d0d' },
+  { id: 'c3', name: 'Orange Fire', bg: '#ff6b35', text: '#ffffff', accent: '#ffffff' },
+  { id: 'c4', name: 'Deep Blue Split', bg: '#0d47a1', text: '#ffffff', accent: '#90caf9' },
+  { id: 'c5', name: 'White Brutalist', bg: '#ffffff', text: '#0d0d0d', accent: '#ff6b35' },
+  { id: 'c6', name: 'Dark Grid', bg: '#0a0a0a', text: '#ffffff', accent: '#00e676' },
 ]
 
 const SLIDE_TYPES = ['hook', 'value', 'example', 'tip', 'cta'] as const
@@ -27,54 +29,66 @@ const SLIDE_TYPE_COLORS: Record<string, string> = {
   cta: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
 }
 
-function SlidePreview({ slide, template }: { slide: CarouselSlide; template: typeof TEMPLATES[0] }) {
-  const style: React.CSSProperties = {
-    background: template.bg,
-    color: slide.text_color || template.text,
-    width: '100%',
-    aspectRatio: '1',
-    borderRadius: '12px',
-    padding: '28px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    gap: '12px',
-    boxSizing: 'border-box',
-    position: 'relative',
-    overflow: 'hidden',
+function renderHeadline(headline: string, templateId: string) {
+  const words = headline.split(' ')
+  if (words.length <= 1) return <>{headline}</>
+  
+  if (templateId === 'c1' || templateId === 'c4' || templateId === 'c6') {
+    const normal = words.slice(0, -2).join(' ')
+    const highlight = words.slice(-2).join(' ')
+    return <>{normal}{normal && <br/>}<span>{highlight}</span>{templateId === 'c1' && <span className="slide-cursor"/>}</>
+  }
+  if (templateId === 'c2') {
+    const normal = words.slice(0, -1).join(' ')
+    const highlight = words.slice(-1).join(' ')
+    return <>{normal}{normal && <br/>}<em>{highlight}</em></>
+  }
+  if (templateId === 'c3') {
+    const highlight = words.slice(0, 2).join(' ')
+    const normal = words.slice(2).join(' ')
+    return <><strong>{highlight}</strong><br/>{normal}</>
+  }
+  if (templateId === 'c5') {
+    const sToken = words[0]
+    const bToken = words[words.length - 1]
+    const normal = words.slice(1, -1).join(' ')
+    return <><s>{sToken}</s><br/>{normal}<br/><b>{bToken}</b></>
   }
 
-  const accentBar = {
-    width: '40px',
-    height: '4px',
-    borderRadius: '2px',
-    backgroundColor: template.accent,
-    marginBottom: '8px',
-  } as React.CSSProperties
+  return <>{headline}</>
+}
+
+function SlidePreview({ slide, template }: { slide: CarouselSlide; template: typeof TEMPLATES[0] }) {
+  const tId = template.id
 
   return (
-    <div style={style}>
-      {template.id === 'neon-tech' && (
-        <div style={{
-          position: 'absolute', top: '-40px', right: '-40px',
-          width: '120px', height: '120px', borderRadius: '50%',
-          background: `radial-gradient(circle, ${template.accent}20 0%, transparent 70%)`,
-        }} />
-      )}
-      <div style={accentBar} />
-      {slide.type && (
-        <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '2px', color: template.accent, fontWeight: 700 }}>
-          {slide.type}
-        </span>
-      )}
-      <h3 style={{ fontSize: '20px', fontWeight: 800, lineHeight: 1.2, margin: 0 }}>
-        {slide.headline}
-      </h3>
-      <p style={{ fontSize: '13px', opacity: 0.8, lineHeight: 1.6, margin: 0 }}>
-        {slide.body}
-      </p>
-      <div style={{ position: 'absolute', bottom: '16px', right: '20px', fontSize: '11px', opacity: 0.4 }}>
-        {slide.slide_order}
+    <div className="slide-container">
+      <div className={`slide-card slide-${tId}`} style={{ background: template.bg }}>
+        
+        {tId === 'c2' && (
+          <>
+            <div className="slide-bar"></div>
+            <div className="slide-code-stamp">frontend/<br/>backend/<br/>database/<br/>hosting/</div>
+          </>
+        )}
+        {tId === 'c3' && <div className="slide-stamp">FULL<br/>STACK</div>}
+        {tId === 'c4' && <div className="slide-line"></div>}
+        {tId === 'c5' && <div className="slide-accent"></div>}
+        {tId === 'c6' && (
+          <>
+            <div className="slide-grid-bg"></div>
+            <div className="slide-dot"></div>
+          </>
+        )}
+
+        <div className="slide-tag">// hook {String(slide.slide_order).padStart(2, '0')} — THE {slide.type?.toUpperCase()}</div>
+        <div className="slide-hook">
+          {renderHeadline(slide.headline || 'Your Headline Here', tId)}
+        </div>
+        <div className="slide-sub">
+          {slide.body || 'Add your slide content here to explain your point.'}
+        </div>
+
       </div>
     </div>
   )

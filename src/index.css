@@ -157,3 +157,208 @@
     scrollbar-width: none;
   }
 }
+
+/* ── Carousel Slide Templates (400x400 Base) ── */
+.slide-container {
+  width: 100%;
+  aspect-ratio: 1/1;
+  container-type: inline-size;
+}
+
+.slide-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 8cqw 10cqw;
+  background: #0d0d0d;
+  font-family: 'DM Sans', sans-serif;
+  box-sizing: border-box;
+}
+
+.slide-card *, .slide-card *::before, .slide-card *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.slide-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 3cqw;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 3cqw;
+  opacity: 0.6;
+}
+
+.slide-hook {
+  font-family: 'Bebas Neue', sans-serif;
+  line-height: 1.0;
+  letter-spacing: 0.5px;
+  font-size: 11cqw;
+}
+
+.slide-sub {
+  font-size: 3.5cqw;
+  line-height: 1.4;
+  margin-top: 4cqw;
+  max-width: 90%;
+  font-weight: 400;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── CARD 1: Terminal Green on Black ── */
+.slide-c1 { background: #000; border: 1px solid #1a1a1a; }
+.slide-c1::before {
+  content: '$ npm run execute';
+  position: absolute;
+  top: 8cqw; left: 10cqw;
+  font-family: 'Space Mono', monospace;
+  font-size: 3cqw;
+  color: #00e676;
+  opacity: 0.5;
+}
+.slide-c1::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top left, rgba(0,230,118,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.slide-c1 .slide-tag { color: #00e676; }
+.slide-c1 .slide-hook { color: #fff; text-transform: uppercase; }
+.slide-c1 .slide-hook span { color: #00e676; }
+.slide-c1 .slide-sub { color: #a3a3a3; }
+.slide-c1 .slide-cursor {
+  display: inline-block;
+  width: 1cqw; height: 1em;
+  background: #00e676;
+  margin-left: 1.5cqw;
+  vertical-align: text-bottom;
+}
+
+/* ── CARD 2: Off-white editorial ── */
+.slide-c2 { background: #f4f1eb; }
+.slide-c2 .slide-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2cqw;
+  background: #0d0d0d;
+}
+.slide-c2 .slide-code-stamp {
+  position: absolute;
+  top: 8cqw; right: 10cqw;
+  font-family: 'Space Mono', monospace;
+  font-size: 2.5cqw;
+  color: #555;
+  text-align: right;
+  line-height: 1.5;
+  opacity: 0.5;
+  white-space: pre-wrap;
+}
+.slide-c2 .slide-tag { color: #555; }
+.slide-c2 .slide-hook { color: #0d0d0d; text-transform: uppercase; }
+.slide-c2 .slide-hook em { font-style: normal; background: #0d0d0d; color: #f4f1eb; padding: 0.5cqw 1.5cqw; }
+.slide-c2 .slide-sub { color: #444; border-left: 0.8cqw solid #0d0d0d; padding-left: 3cqw; }
+
+/* ── CARD 3: Orange fire ── */
+.slide-c3 { background: #ff6b35; }
+.slide-c3::before {
+  content: '';
+  position: absolute;
+  bottom: -20cqw; right: -20cqw;
+  width: 70cqw; height: 70cqw;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.12);
+  pointer-events: none;
+}
+.slide-c3 .slide-tag { color: rgba(0,0,0,0.5); }
+.slide-c3 .slide-hook { color: #fff; position: relative; z-index: 1; text-transform: uppercase; }
+.slide-c3 .slide-hook strong { display: block; font-size: 6cqw; letter-spacing: 2px; opacity: 0.85; }
+.slide-c3 .slide-sub { color: rgba(255,255,255,0.9); position: relative; z-index: 1; }
+.slide-c3 .slide-stamp {
+  position: absolute;
+  top: 8cqw; right: 8cqw;
+  width: 18cqw; height: 18cqw;
+  border: 0.6cqw solid rgba(255,255,255,0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 5cqw;
+  color: #fff;
+  letter-spacing: 2px;
+  text-align: center;
+  line-height: 1.1;
+  z-index: 1;
+}
+
+/* ── CARD 4: Deep blue split ── */
+.slide-c4 { background: #0d47a1; }
+.slide-c4::after {
+  content: '</>';
+  position: absolute;
+  bottom: -4cqw; right: 6cqw;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 35cqw;
+  color: rgba(255,255,255,0.05);
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+}
+.slide-c4 .slide-tag { color: rgba(255,255,255,0.4); }
+.slide-c4 .slide-hook { color: #fff; position: relative; z-index: 1; text-transform: uppercase; }
+.slide-c4 .slide-hook span { color: #90caf9; }
+.slide-c4 .slide-sub { color: rgba(255,255,255,0.8); position: relative; z-index: 1; }
+.slide-c4 .slide-line {
+  position: absolute;
+  top: 0; left: 12cqw;
+  width: 0.5cqw; height: 40%;
+  background: rgba(255,255,255,0.12);
+}
+
+/* ── CARD 5: White brutalist ── */
+.slide-c5 { background: #fff; border: 0.8cqw solid #0d0d0d; }
+.slide-c5 .slide-accent { 
+  position: absolute; top: 0; right: 0; 
+  width: 0; height: 0; 
+  border-top: 20cqw solid #ff6b35; 
+  border-left: 20cqw solid transparent; 
+}
+.slide-c5 .slide-tag { color: #888; }
+.slide-c5 .slide-hook { color: #0d0d0d; text-transform: uppercase; }
+.slide-c5 .slide-hook s { text-decoration-color: #ff6b35; text-decoration-thickness: 1cqw; color: #999; }
+.slide-c5 .slide-hook b { color: #ff6b35; }
+.slide-c5 .slide-sub { color: #444; }
+
+/* ── CARD 6: Dark grid ── */
+.slide-c6 { background: #0a0a0a; }
+.slide-c6 .slide-grid-bg {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 8cqw 8cqw;
+  pointer-events: none;
+}
+.slide-c6 .slide-dot {
+  position: absolute;
+  top: 8cqw; right: 8cqw;
+  width: 3.5cqw; height: 3.5cqw;
+  border-radius: 50%;
+  background: #00e676;
+  box-shadow: 0 0 3cqw #00e676;
+}
+.slide-c6 .slide-tag { color: #00e676; position: relative; z-index: 1; }
+.slide-c6 .slide-hook { color: #fff; position: relative; z-index: 1; text-transform: uppercase; }
+.slide-c6 .slide-hook span { color: #00e676; border-bottom: 0.8cqw solid #00e676; }
+.slide-c6 .slide-sub { 
+  font-family: 'Space Mono', monospace; 
+  font-size: 3cqw; 
+  color: #777; 
+  line-height: 1.8; 
+  position: relative; 
+  z-index: 1; 
+}
