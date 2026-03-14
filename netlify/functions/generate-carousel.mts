@@ -14,21 +14,23 @@ export const handler: Handler = async (event) => {
 
     const types = SLIDE_SEQUENCE.slice(0, slide_count)
 
-    const prompt = `You are an expert carousel content creator for the Automations & Tech niche.
+    const prompt = `You are an expert carousel content creator.
 Create a ${slide_count}-slide Instagram carousel about: "${topic}"
 
-Generate exactly ${slide_count} slides in this JSON format. Each slide must have:
-- slide_order (1 to ${slide_count})
-- type: one of these in order: ${types.join(', ')}
-- headline: short punchy headline (max 8 words)
-- body: 1–2 sentence value statement (max 30 words)
+STRATEGY: Incorporate the "Full-Stack Hooks" playbook for slide composition. Do NOT copy the exact example words, but strictly use the structural template of these styles matched to the topic:
+- The Flex: 4 short punchy lines (e.g., "[Action 1]. [Action 2]. [Action 3]. [Result].")
+- The Callout: Challenge a norm (e.g., "YOUR [Target] DESERVES MORE THAN A [Basic Solution].")
+- The Offer: An irresistible value prop (e.g., "What if you could get [Outcome] for [Price/Time]?")
+- The Truth: An exposing fact (e.g., "MOST [Professionals] ARE ONE [Mistake] AWAY FROM [Failure].")
+- The Price Shock: Highlighting value (e.g., "<s>[Expensive]</s> [Premium Solution]. [Accessible Value].")
+- The Code Drop: Direct delivery (e.g., "I WRITE THE [Code]. I DEPLOY THE [App]. YOU GET THE [Result].")
 
-Rules for slide types:
-- hook: Bold claim, surprising fact, or provocative question
-- value: A key insight or actionable takeaway  
-- example: Real-world example or use case
-- tip: Actionable tip they can implement today
-- cta: Clear call to action (follow, save, share, try)
+Generate exactly ${slide_count} slides in this JSON format.
+Each slide must have:
+- slide_order (1 to ${slide_count})
+- type: (Assign one of: hook, value, example, tip, cta)
+- headline: Follow the structural templates above. Max 10 words. KEEP IT SHORT, BOLD, AND PROVOCATIVE.
+- body: 1–2 sentence value statement (max 30 words)
 
 Return ONLY valid JSON array, no markdown, no explanation:
 [{"slide_order":1,"type":"hook","headline":"...","body":"..."},...]`
