@@ -131,3 +131,20 @@ CREATE INDEX IF NOT EXISTS idx_cron_logs_job_name ON cron_logs(job_name);
 -- ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 -- ALTER TABLE scheduled_posts ENABLE ROW LEVEL SECURITY;
 -- CREATE POLICY "Users see own posts" ON posts FOR ALL USING (auth.uid()::text = user_id::text);
+
+-- ── Storage Bucket Security Policies ──────────────────────────────────────────
+-- These policies are required to allow the frontend to upload carousel images anonymously.
+CREATE POLICY "Allow public uploads to carousel_assets" 
+ON storage.objects FOR INSERT 
+TO public 
+WITH CHECK (bucket_id = 'carousel_assets');
+
+CREATE POLICY "Allow public updates to carousel_assets" 
+ON storage.objects FOR UPDATE 
+TO public 
+USING (bucket_id = 'carousel_assets');
+
+CREATE POLICY "Allow public reads from carousel_assets" 
+ON storage.objects FOR SELECT 
+TO public 
+USING (bucket_id = 'carousel_assets');
