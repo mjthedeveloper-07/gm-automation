@@ -2,7 +2,7 @@ import type { Handler } from '@netlify/functions'
 import { supabaseQuery } from './_mcp-helper.mjs'
 
 // Your custom verify token — set this in Netlify env vars as WEBHOOK_VERIFY_TOKEN
-const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'gm-automation-webhook-2025'
+const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN
 
 export const handler: Handler = async (event) => {
   // ── Webhook Verification (GET) ────────────────────────────────────────────
