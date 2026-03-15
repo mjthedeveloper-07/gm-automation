@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@400;500;700;800&family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -196,18 +196,20 @@
 
 .slide-hook {
   font-family: 'Bebas Neue', sans-serif;
-  line-height: 1.0;
-  letter-spacing: 0.5px;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
   font-size: 11cqw;
+  margin-bottom: 2cqw;
 }
 
 .slide-sub {
-  font-size: 3.5cqw;
-  line-height: 1.4;
-  margin-top: 4cqw;
-  max-width: 90%;
+  font-size: 3.8cqw;
+  line-height: 1.45;
+  margin-top: 2cqw;
+  max-width: 92%;
   font-weight: 400;
   font-family: 'DM Sans', sans-serif;
+  opacity: 0.9;
 }
 
 /* ── CARD 1: Terminal Green on Black ── */

@@ -243,13 +243,20 @@ export default function CarouselBuilder() {
         // Small delay to ensure all assets/fonts are loaded in the hidden container
         await new Promise(r => setTimeout(r, 500))
 
-        addNotification('info', `Rendering slide ${i+1}...`)
         // Target 1080px resolution for Instagram quality
-        const pixelRatio = 1080 / node.offsetWidth
+        const exportWidth = 1080
+        const pixelRatio = 2 // Double sharpness
+        
         const blob = await toBlob(node, {
+          canvasWidth: exportWidth,
+          canvasHeight: exportWidth,
           quality: 1,
           pixelRatio,
           cacheBust: true,
+          style: {
+            transform: 'scale(1)',
+            transformOrigin: 'top left'
+          }
         }).catch(err => {
           console.error('html-to-image error:', err)
           throw new Error(`Rendering failed: ${err.message}`)
@@ -573,9 +580,9 @@ export default function CarouselBuilder() {
       </div>
 
       {/* Hidden Export Container — keeping it in DOM but off-screen and visible for html-to-image stability */}
-      <div style={{ position: 'absolute', top: '-10000px', left: '-10000px', pointerEvents: 'none', visibility: 'visible' }}>
+      <div style={{ position: 'absolute', top: '-20000px', left: '-20000px', pointerEvents: 'none', visibility: 'visible' }}>
         {slides.map((slide, i) => (
-          <div key={i} id={`slide-export-${i}`} style={{ width: '400px' }}>
+          <div key={i} id={`slide-export-${i}`} style={{ width: '1080px', height: '1080px' }}>
             <SlidePreview slide={slide} template={selectedTemplate} />
           </div>
         ))}
