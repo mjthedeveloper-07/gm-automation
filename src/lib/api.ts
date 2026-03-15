@@ -21,11 +21,24 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: res.statusText }))
-    throw new Error(err.error || `Request failed: ${res.status}`)
+
+  // Netlify Background Functions return 202 Accepted with an empty body
+  if (res.status === 202) {
+    return { success: true } as unknown as T
   }
-  return res.json()
+
+  const text = await res.text()
+  let data: any
+  try {
+    data = text ? JSON.parse(text) : {}
+  } catch (e) {
+    data = { error: 'Invalid JSON response' }
+  }
+
+  if (!res.ok) {
+    throw new Error(data.error || `Request failed: ${res.status}`)
+  }
+  return data as T
 }
 
 const GET = <T>(path: string) => request<T>(path)
