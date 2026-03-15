@@ -134,16 +134,19 @@ CREATE INDEX IF NOT EXISTS idx_cron_logs_job_name ON cron_logs(job_name);
 
 -- ── Storage Bucket Security Policies ──────────────────────────────────────────
 -- These policies are required to allow the frontend to upload carousel images anonymously.
+DROP POLICY IF EXISTS "Allow public uploads to carousel_assets" ON storage.objects;
 CREATE POLICY "Allow public uploads to carousel_assets" 
 ON storage.objects FOR INSERT 
 TO public 
 WITH CHECK (bucket_id = 'carousel_assets');
 
+DROP POLICY IF EXISTS "Allow public updates to carousel_assets" ON storage.objects;
 CREATE POLICY "Allow public updates to carousel_assets" 
 ON storage.objects FOR UPDATE 
 TO public 
 USING (bucket_id = 'carousel_assets');
 
+DROP POLICY IF EXISTS "Allow public reads from carousel_assets" ON storage.objects;
 CREATE POLICY "Allow public reads from carousel_assets" 
 ON storage.objects FOR SELECT 
 TO public 
