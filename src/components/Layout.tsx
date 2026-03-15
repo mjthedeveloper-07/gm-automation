@@ -15,8 +15,12 @@ import {
   AlertCircle,
   Info,
   Bot,
+  Shield,
+  LogOut,
+  Crown,
 } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
+import { useAuth } from '../lib/auth'
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -30,6 +34,7 @@ const navItems = [
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { sidebarOpen, toggleSidebar, notifications, removeNotification } = useAppStore()
+  const { user, isAdmin, signOut } = useAuth()
   const location = useLocation()
 
   // Close sidebar on mobile when route changes
@@ -38,6 +43,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       useAppStore.getState().setSidebarOpen(false)
     }
   }, [location.pathname])
+
+  // Build user initials for avatar
+  const initials = user?.email?.charAt(0).toUpperCase() ?? 'U'
 
   return (
     <div className="flex h-screen overflow-hidden bg-dark-950">
@@ -86,7 +94,48 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {sidebarOpen && <span className="truncate">{label}</span>}
             </NavLink>
           ))}
+
+          {/* Admin link — only visible to admin */}
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                `${isActive ? 'sidebar-item-active border-brand-500/40 text-brand-400' : 'sidebar-item-inactive text-brand-500/70 hover:text-brand-400 hover:bg-brand-500/5'} ${!sidebarOpen && 'md:justify-center'}`
+              }
+              title={!sidebarOpen ? 'Admin' : undefined}
+            >
+              <Crown className="w-5 h-5 flex-shrink-0" />
+              {sidebarOpen && <span className="truncate">Admin Panel</span>}
+            </NavLink>
+          )}
         </nav>
+
+        {/* User footer in sidebar */}
+        {sidebarOpen && user && (
+          <div className="p-3 border-t border-dark-700">
+            <div className="flex items-center gap-2.5 px-2 py-2">
+              {/* Avatar */}
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 ${isAdmin ? 'bg-gradient-to-br from-brand-500 to-purple-500' : 'bg-dark-600'}`}>
+                {initials}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-white truncate">{user.email}</p>
+                {isAdmin && (
+                  <p className="text-xs text-brand-400 flex items-center gap-1">
+                    <Shield className="w-2.5 h-2.5" />Admin
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={signOut}
+                title="Sign out"
+                className="text-dark-500 hover:text-red-400 transition-colors p-1 rounded flex-shrink-0"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* AI Status */}
         {sidebarOpen && (
@@ -117,11 +166,35 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
           <div className="flex-1" />
 
+          {/* Admin badge in topbar */}
+          {isAdmin && (
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-500/10 border border-brand-500/30">
+              <Crown className="w-3 h-3 text-brand-400" />
+              <span className="text-xs font-semibold text-brand-400">Admin</span>
+            </div>
+          )}
+
           {/* Status pill */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20">
             <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
             <span className="text-xs font-medium text-green-400">All Systems Active</span>
           </div>
+
+          {/* User avatar in topbar (compact) */}
+          {user && (
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold cursor-default ${isAdmin ? 'bg-gradient-to-br from-brand-500 to-purple-500 shadow-brand' : 'bg-dark-600'}`}>
+                {initials}
+              </div>
+              <button
+                onClick={signOut}
+                title="Sign out"
+                className="btn-ghost p-2 text-dark-400 hover:text-red-400"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </header>
 
         {/* Page Content */}
