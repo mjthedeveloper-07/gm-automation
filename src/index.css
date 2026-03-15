@@ -364,3 +364,80 @@
   position: relative; 
   z-index: 1; 
 }
+
+/* ── CARD 7: Founder Vision (Yellow/Orange) ── */
+.slide-c7 { background: #fbbd23; transition: all 0.3s ease; }
+.slide-c7::before {
+  content: '';
+  position: absolute; top: -10cqw; right: -10cqw;
+  width: 40cqw; height: 40cqw;
+  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.slide-c7 .slide-avatar {
+  position: absolute; bottom: 0; right: 0;
+  width: 60cqw; height: 60cqw;
+  object-fit: contain;
+  z-index: 2;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+}
+.slide-c7 .slide-tag { color: rgba(0,0,0,0.6); font-weight: 700; opacity: 1; }
+.slide-c7 .slide-hook { color: #fff; text-transform: none; font-size: 13cqw; font-weight: 800; line-height: 1.0; text-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 85%; }
+.slide-c7 .slide-hook span { color: #2563eb; }
+.slide-c7 .slide-sub { color: #fff; font-weight: 500; opacity: 1; width: 65%; font-size: 4.2cqw; }
+.slide-c7 .slide-cta {
+  display: inline-flex; align-items: center; gap: 2cqw;
+  background: #2563eb; color: #fff;
+  padding: 3cqw 6cqw; border-radius: 9999px;
+  font-weight: 700; font-size: 3.5cqw;
+  margin-top: 5cqw; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+}
+.slide-c7 .slide-step {
+  position: absolute; top: 10cqw; left: 10cqw;
+  width: 10cqw; height: 10cqw;
+  background: #2563eb; color: #fff;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 4cqw;
+}
+
+/* ── CARD 8: Design Master (Dark Blue Serif) ── */
+.slide-c8 { background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+.slide-c8::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at center, rgba(30, 41, 59, 0.5) 0%, #0f172a 100%);
+  z-index: 0;
+}
+.slide-c8 .slide-ring {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85cqw; height: 85cqw;
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  border-radius: 50%; z-index: 1;
+}
+.slide-c8 .slide-ring::before {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 65cqw; height: 65cqw;
+  border: 1px solid rgba(245, 158, 11, 0.05);
+  border-radius: 50%;
+}
+.slide-c8 .slide-tag { color: #f59e0b; font-family: 'DM Sans', sans-serif; font-size: 3.5cqw; opacity: 0.8; z-index: 2; }
+.slide-c8 .slide-hook { 
+  color: #fff; text-transform: none; font-size: 11cqw; font-weight: 700; 
+  width: 90%; font-family: 'DM Sans', sans-serif; z-index: 2; margin-bottom: 4cqw;
+}
+.slide-c8 .slide-hook span { color: #f59e0b; font-style: italic; }
+.slide-c8 .slide-sub { color: #94a3b8; font-size: 4cqw; width: 80%; line-height: 1.6; z-index: 2; }
+.slide-c8 .slide-step {
+  width: 12cqw; height: 12cqw;
+  border: 1px solid #f59e0b; color: #f59e0b;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: 4cqw; margin-bottom: 6cqw; z-index: 2;
+}
+.slide-c8 .slide-footer {
+  position: absolute; bottom: 10cqw; left: 0; right: 0;
+  display: flex; justify-content: center; gap: 4cqw;
+  z-index: 2; opacity: 0.5;
+}

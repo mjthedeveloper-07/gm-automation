@@ -17,6 +17,8 @@ const TEMPLATES = [
   { id: 'c4', name: 'Deep Blue Split', bg: '#0d47a1', text: '#ffffff', accent: '#90caf9' },
   { id: 'c5', name: 'White Brutalist', bg: '#ffffff', text: '#0d0d0d', accent: '#ff6b35' },
   { id: 'c6', name: 'Dark Grid', bg: '#0a0a0a', text: '#ffffff', accent: '#00e676' },
+  { id: 'c7', name: 'Founder Vision', bg: '#fbbd23', text: '#ffffff', accent: '#2563eb' },
+  { id: 'c8', name: 'Design Master', bg: '#0f172a', text: '#ffffff', accent: '#f59e0b' },
 ]
 
 const SLIDE_TYPES = ['hook', 'value', 'example', 'tip', 'cta'] as const
@@ -55,6 +57,17 @@ function renderHeadline(headline: string, templateId: string) {
     return <><s>{sToken}</s><br/>{normal}<br/><b>{bToken}</b></>
   }
 
+  if (templateId === 'c8') {
+    const normal = words.slice(0, -1).join(' ')
+    const highlight = words.slice(-1).join(' ')
+    return <>{normal}{normal && <br/>}<span>{highlight}</span></>
+  }
+  if (templateId === 'c7') {
+    const normal = words.slice(0, 2).join(' ')
+    const highlight = words.slice(2).join(' ')
+    return <>{normal}{normal && <br/>}<span>{highlight}</span></>
+  }
+
   return <>{headline}</>
 }
 
@@ -80,6 +93,22 @@ function SlidePreview({ slide, template }: { slide: CarouselSlide; template: typ
             <div className="slide-dot"></div>
           </>
         )}
+        {tId === 'c7' && (
+          <>
+            <img 
+              src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=800" 
+              className="slide-avatar" 
+              alt="Avatar" 
+            />
+            {slide.type !== 'hook' && <div className="slide-step">{slide.slide_order}</div>}
+          </>
+        )}
+        {tId === 'c8' && (
+          <>
+            <div className="slide-ring"></div>
+            {slide.type !== 'hook' && <div className="slide-step">0{slide.slide_order}</div>}
+          </>
+        )}
 
         <div className="slide-tag">// hook {String(slide.slide_order).padStart(2, '0')} — THE {slide.type?.toUpperCase()}</div>
         <div className="slide-hook">
@@ -88,6 +117,15 @@ function SlidePreview({ slide, template }: { slide: CarouselSlide; template: typ
         <div className="slide-sub">
           {slide.body || 'Add your slide content here to explain your point.'}
         </div>
+
+        {tId === 'c7' && slide.type === 'cta' && (
+          <div className="slide-cta">Start Your Journey Now →</div>
+        )}
+        {tId === 'c8' && (
+          <div className="slide-footer">
+            <span>Socials</span> • <span>Community</span> • <span>Updates</span>
+          </div>
+        )}
 
       </div>
     </div>
