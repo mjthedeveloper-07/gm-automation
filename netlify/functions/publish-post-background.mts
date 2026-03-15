@@ -54,16 +54,15 @@ async function publishInstagram(content: string, mediaUrls?: string[], caption?:
       if (!childData.id) throw new Error(`Failed to create slide ${i+1}: No ID returned`)
       childIds.push(childData.id)
       
-      // Wait 2 seconds between slide containers to stay under burst limits
+      // Wait 1 second between slide containers to stay under burst limits
       if (i < finalMediaUrls.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        await new Promise(resolve => setTimeout(resolve, 1000))
       }
     }
 
-    // Poll each child for FINISHED status sequentially to stay under rate limits
-    for (const childId of childIds) {
-      await pollContainerStatus(baseUrl, childId, accessToken)
-    }
+    // Poll each child for FINISHED status in parallel to stay under the 26s timeout.
+    // GET requests for polling are lighter and safer to parallelize than POST creation calls.
+    await Promise.all(childIds.map(childId => pollContainerStatus(baseUrl, childId, accessToken)))
 
     // Create carousel container
     const carouselRes = await fetch(`${baseUrl}/${igUserId}/media`, {
@@ -101,8 +100,8 @@ async function publishInstagram(content: string, mediaUrls?: string[], caption?:
   // Poll container status
   await pollContainerStatus(baseUrl, containerId, accessToken)
 
-  // Extra safety delay before final publish
-  await new Promise(resolve => setTimeout(resolve, 2000))
+  // Minimal safety delay before final publish
+  await new Promise(resolve => setTimeout(resolve, 1000))
 
   // Publish the container
   const publishRes = await fetch(`${baseUrl}/${igUserId}/media_publish`, {

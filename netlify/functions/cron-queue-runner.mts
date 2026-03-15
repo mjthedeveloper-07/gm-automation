@@ -23,7 +23,7 @@ export const handler: Handler = async (_event) => {
     for (const item of pending) {
       try {
         for (const platform of item.platforms) {
-          await fetch(`${process.env.URL || 'http://localhost:8888'}/.netlify/functions/publish-post`, {
+          await fetch(`${process.env.URL || 'http://localhost:8888'}/.netlify/functions/publish-post-background`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

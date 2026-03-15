@@ -52,7 +52,7 @@ export const api = {
 
   // ── Publishing ────────────────────────────────────────────────────
   publishPost: (body: PublishPostRequest) =>
-    POST<PublishResponse>('/publish-post', body),
+    POST<PublishResponse>('/publish-post-background', body),
 
   // ── Scheduling ────────────────────────────────────────────────────
   schedulePost: (body: SchedulePostRequest) =>

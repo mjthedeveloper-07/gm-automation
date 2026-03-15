@@ -63,6 +63,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/publish-post-background"
+  to = "/.netlify/functions/publish-post-background"
+  status = 200
+
+[[redirects]]
   from = "/api/publish-post"
   to = "/.netlify/functions/publish-post"
   status = 200
