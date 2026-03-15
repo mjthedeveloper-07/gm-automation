@@ -29,30 +29,56 @@ async function publishInstagram(content: string, mediaUrls?: string[], caption?:
 
   if (finalMediaUrls.length > 1) {
     // Carousel: create individual containers first concurrently
-    const createPromises = finalMediaUrls.map(async (imgUrl) => {
+    const childIds: string[] = []
+    
+    for (let i = 0; i < finalMediaUrls.length; i++) {
+      const imgUrl = finalMediaUrls[i]
       const childRes = await fetch(`${baseUrl}/${igUserId}/media`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image_url: imgUrl, is_carousel_item: true, access_token: accessToken }),
       })
+      
+      if (!childRes.ok) {
+        const errorData = await childRes.json().catch(() => ({}))
+        console.error('Meta API Carousel Item Error:', errorData)
+        
+        if (errorData.error?.code === 4 || errorData.error?.code === 17 || errorData.error?.code === 32 || errorData.error?.message?.includes('limit reached')) {
+          throw new Error('Instagram Rate Limit Reached: Please wait an hour before trying again.')
+        }
+        
+        throw new Error(`Failed to create slide ${i+1}: ${errorData.error?.message || childRes.statusText}`)
+      }
+      
       const childData = await childRes.json()
-      if (!childData.id) throw new Error('Failed to create carousel child container')
-      return childData.id
-    })
-    
-    const childIds: string[] = await Promise.all(createPromises)
+      if (!childData.id) throw new Error(`Failed to create slide ${i+1}: No ID returned`)
+      childIds.push(childData.id)
+      
+      // Wait 2 seconds between slide containers to stay under burst limits
+      if (i < finalMediaUrls.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 2000))
+      }
+    }
 
-    // Poll each child for FINISHED status concurrently
-    await Promise.all(childIds.map(childId => pollContainerStatus(baseUrl, childId, accessToken)))
+    // Poll each child for FINISHED status sequentially to stay under rate limits
+    for (const childId of childIds) {
+      await pollContainerStatus(baseUrl, childId, accessToken)
+    }
 
     // Create carousel container
     const carouselRes = await fetch(`${baseUrl}/${igUserId}/media`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ media_type: 'CAROUSEL', children: childIds.join(','), caption: postCaption, access_token: accessToken }),
+      body: JSON.stringify({ media_type: 'CAROUSEL', children: childIds, caption: postCaption, access_token: accessToken }),
     })
+    if (!carouselRes.ok) {
+      const errorData = await carouselRes.json().catch(() => ({}))
+      console.error('Meta API Carousel Container Error:', errorData)
+      const detail = errorData.error?.error_user_msg || errorData.error?.message || carouselRes.statusText
+      throw new Error(`Failed to create carousel container: ${detail} (Code: ${errorData.error?.code || 'unknown'})`)
+    }
     const carouselData = await carouselRes.json()
-    if (!carouselData.id) throw new Error('Failed to create carousel container')
+    if (!carouselData.id) throw new Error('Failed to create carousel container: No ID returned')
     containerId = carouselData.id
   } else {
     // Single image post (or fallback image)
@@ -61,13 +87,22 @@ async function publishInstagram(content: string, mediaUrls?: string[], caption?:
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ image_url: finalMediaUrls[0], caption: postCaption, access_token: accessToken }),
     })
+    if (!mediaRes.ok) {
+      const errorData = await mediaRes.json().catch(() => ({}))
+      console.error('Meta API Media Error:', errorData)
+      const detail = errorData.error?.error_user_msg || errorData.error?.message || mediaRes.statusText
+      throw new Error(`Failed to create media container: ${detail} (Code: ${errorData.error?.code || 'unknown'})`)
+    }
     const mediaData = await mediaRes.json()
-    if (!mediaData.id) throw new Error('Failed to create media container')
+    if (!mediaData.id) throw new Error('Failed to create media container: No ID returned')
     containerId = mediaData.id
   }
 
   // Poll container status
   await pollContainerStatus(baseUrl, containerId, accessToken)
+
+  // Extra safety delay before final publish
+  await new Promise(resolve => setTimeout(resolve, 2000))
 
   // Publish the container
   const publishRes = await fetch(`${baseUrl}/${igUserId}/media_publish`, {
@@ -75,11 +110,17 @@ async function publishInstagram(content: string, mediaUrls?: string[], caption?:
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ creation_id: containerId, access_token: accessToken }),
   })
-  const publishData = await publishRes.json()
-  if (!publishData.id) throw new Error('Instagram publish failed')
-
-  return publishData.id
-}
+    if (!publishRes.ok) {
+      const errorData = await publishRes.json().catch(() => ({}))
+      console.error('Meta API Publish Error:', errorData)
+      const detail = errorData.error?.error_user_msg || errorData.error?.message || publishRes.statusText
+      throw new Error(`Instagram publish failed: ${detail} (Code: ${errorData.error?.code || 'unknown'})`)
+    }
+    const publishData = await publishRes.json()
+    if (!publishData.id) throw new Error('Instagram publish failed: No ID returned')
+  
+    return publishData.id
+  }
 
 async function pollContainerStatus(baseUrl: string, containerId: string, accessToken: string, maxAttempts = 10): Promise<void> {
   for (let i = 0; i < maxAttempts; i++) {

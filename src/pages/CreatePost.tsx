@@ -365,27 +365,30 @@ export default function CreatePost() {
                 Publish Now
               </button>
 
-              <div className="flex gap-2">
-                <input
-                  type="datetime-local"
-                  className="input-field flex-1 text-sm"
-                  value={scheduleDate}
-                  onChange={(e) => setScheduleDate(e.target.value)}
-                />
-                <button
-                  className="btn-secondary flex items-center gap-2"
-                  disabled={!scheduleDate || scheduleMutation.isPending}
-                  onClick={() => scheduleMutation.mutate({
-                    content: draft.content || draft.caption || '',
-                    platforms: [draft.platform || 'instagram'],
-                    scheduled_at: new Date(scheduleDate).toISOString(),
-                    caption: draft.caption,
-                    hashtags: draft.hashtags,
-                  })}
-                >
-                  <Clock className="w-4 h-4" />
-                  Schedule
-                </button>
+              <div className="pt-2 border-t border-dark-700 space-y-2">
+                <p className="text-[10px] font-bold text-dark-500 uppercase tracking-wider">Later</p>
+                <div className="flex gap-2">
+                  <input
+                    type="datetime-local"
+                    className="input-field flex-1 text-sm bg-dark-950"
+                    value={scheduleDate}
+                    onChange={(e) => setScheduleDate(e.target.value)}
+                  />
+                  <button
+                    className="btn-secondary flex items-center gap-2"
+                    disabled={!scheduleDate || scheduleMutation.isPending}
+                    onClick={() => scheduleMutation.mutate({
+                      content: draft.content || draft.caption || '',
+                      platforms: [draft.platform || 'instagram'],
+                      scheduled_at: new Date(scheduleDate).toISOString(),
+                      caption: draft.caption,
+                      hashtags: draft.hashtags,
+                    })}
+                  >
+                    {scheduleMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Clock className="w-4 h-4" />}
+                    Schedule
+                  </button>
+                </div>
               </div>
             </div>
           )}

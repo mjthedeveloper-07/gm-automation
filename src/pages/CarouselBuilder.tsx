@@ -4,7 +4,7 @@ import { toBlob } from 'html-to-image'
 import { supabase } from '../lib/supabase'
 import {
   Layers, Sparkles, ChevronLeft, ChevronRight,
-  Plus, Trash2, Download, Send, Loader2, Palette
+  Plus, Trash2, Download, Send, Loader2, Palette, Clock
 } from 'lucide-react'
 import { api } from '../lib/api'
 import { useAppStore } from '../store/appStore'
@@ -103,6 +103,8 @@ export default function CarouselBuilder() {
   const [slides, setSlides] = useState<CarouselSlide[]>([])
   const [activeSlide, setActiveSlide] = useState(0)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isScheduling, setIsScheduling] = useState(false)
+  const [scheduleDate, setScheduleDate] = useState('')
   const canvasRef = useRef<HTMLDivElement>(null)
 
   const generateMutation = useMutation({
@@ -124,6 +126,19 @@ export default function CarouselBuilder() {
     onError: (e: Error) => {
       addNotification('error', e.message)
       setIsPublishing(false)
+    },
+  })
+
+  const scheduleMutation = useMutation({
+    mutationFn: api.schedulePost,
+    onSuccess: () => {
+      addNotification('success', 'Carousel scheduled successfully!')
+      setIsScheduling(false)
+      setScheduleDate('')
+    },
+    onError: (e: Error) => {
+      addNotification('error', e.message)
+      setIsScheduling(false)
     },
   })
 
@@ -169,52 +184,16 @@ export default function CarouselBuilder() {
     setIsPublishing(true)
 
     try {
-      const mediaUrls: string[] = []
-      
-      addNotification('info', 'Generating high-res carousel images...')
-      
-      // Render and upload sequentially
-      for (let i = 0; i < slides.length; i++) {
-        const node = document.getElementById(`slide-export-${i}`)
-        if (!node) continue
-        
-        // Target 1080px resolution for Instagram quality
-        const pixelRatio = 1080 / node.offsetWidth
-        const blob = await toBlob(node, {
-          quality: 1,
-          pixelRatio,
-          cacheBust: true
-        })
-        
-        if (!blob) throw new Error(`Failed to generate image for slide ${i+1}`)
-        
-        const fileName = `carousel_${Date.now()}_slide_${i+1}.png`
-        addNotification('info', `Uploading slide ${i+1} of ${slides.length}...`)
-        
-        const { data, error } = await supabase.storage
-          .from('carousel_assets')
-          .upload(fileName, blob, { contentType: 'image/png' })
-          
-        if (error) throw error
-        
-        const { data: publicUrlData } = supabase.storage
-          .from('carousel_assets')
-          .getPublicUrl(fileName)
-          
-        mediaUrls.push(publicUrlData.publicUrl)
-      }
+      const mediaUrls: string[] = await prepareMedia()
       
       addNotification('info', 'Publishing carousel to Instagram! This may take a moment...')
       
-      // Create a professional enthusiast caption using the content from the slides
-      const combinedCaption = `🚀 ${topic}\n\n` + 
-        slides.map((s, idx) => `${idx + 1}. ${s.headline}`).join('\n') +
-        `\n\nFollow for more daily value! 🔥\n#automation #software #tech`
+      const combinedCaption = generateCaption()
 
       publishMutation.mutate({
         platform: 'instagram',
-        content: combinedCaption, // the fallback core text
-        caption: combinedCaption, // the actual instagram caption
+        content: combinedCaption,
+        caption: combinedCaption,
         post_type: 'carousel',
         media_urls: mediaUrls
       })
@@ -223,6 +202,96 @@ export default function CarouselBuilder() {
       addNotification('error', err.message || 'Export failed')
       setIsPublishing(false)
     }
+  }
+
+  const handleSchedule = async () => {
+    if (slides.length === 0 || !scheduleDate) return
+    setIsScheduling(true)
+
+    try {
+      const mediaUrls: string[] = await prepareMedia()
+      
+      addNotification('info', 'Scheduling your carousel...')
+      
+      const combinedCaption = generateCaption()
+
+      scheduleMutation.mutate({
+        content: topic, // fallback content
+        platforms: ['instagram'],
+        scheduled_at: new Date(scheduleDate).toISOString(),
+        caption: combinedCaption,
+        media_urls: mediaUrls,
+        content_type: 'carousel'
+      })
+
+    } catch (err: any) {
+      addNotification('error', err.message || 'Scheduling failed')
+      setIsScheduling(false)
+    }
+  }
+
+  const prepareMedia = async () => {
+    const mediaUrls: string[] = []
+    
+    for (let i = 0; i < slides.length; i++) {
+      const node = document.getElementById(`slide-export-${i}`)
+      if (!node) throw new Error(`Export node for slide ${i+1} not found`)
+      
+      try {
+        addNotification('info', `Preparing slide ${i+1} of ${slides.length}...`)
+        
+        // Small delay to ensure all assets/fonts are loaded in the hidden container
+        await new Promise(r => setTimeout(r, 500))
+
+        addNotification('info', `Rendering slide ${i+1}...`)
+        // Target 1080px resolution for Instagram quality
+        const pixelRatio = 1080 / node.offsetWidth
+        const blob = await toBlob(node, {
+          quality: 1,
+          pixelRatio,
+          cacheBust: true,
+        }).catch(err => {
+          console.error('html-to-image error:', err)
+          throw new Error(`Rendering failed: ${err.message}`)
+        })
+        
+        if (!blob) throw new Error(`Rendering produced an empty image for slide ${i+1}`)
+        
+        const fileName = `carousel_${Date.now()}_slide_${i+1}.png`
+        addNotification('info', `Uploading slide ${i+1}...`)
+        
+        const { error } = await supabase.storage
+          .from('carousel_assets')
+          .upload(fileName, blob, { 
+            contentType: 'image/png',
+            cacheControl: '3600',
+            upsert: false
+          })
+          
+        if (error) {
+          console.error('Supabase upload error:', error)
+          throw new Error(`Upload failed: ${error.message}`)
+        }
+        
+        const { data: publicUrlData } = supabase.storage
+          .from('carousel_assets')
+          .getPublicUrl(fileName)
+          
+        if (!publicUrlData.publicUrl) throw new Error(`Failed to get public URL for slide ${i+1}`)
+        mediaUrls.push(publicUrlData.publicUrl)
+        
+      } catch (err: any) {
+        console.error(`Error processing slide ${i+1}:`, err)
+        throw new Error(`Slide ${i+1}: ${err.message}`)
+      }
+    }
+    return mediaUrls
+  }
+
+  const generateCaption = () => {
+    return `🚀 ${topic}\n\n` + 
+      slides.map((s, idx) => `${idx + 1}. ${s.headline}`).join('\n') +
+      `\n\nFollow for more daily value! 🔥\n#automation #software #tech`
   }
 
   // Update canvas mock whenever active slide changes
@@ -345,23 +414,45 @@ export default function CarouselBuilder() {
 
           {/* Actions */}
           {slides.length > 0 && (
-            <div className="card space-y-2">
+            <div className="card space-y-3">
               <h3 className="font-medium text-white text-sm">Export & Publish</h3>
+              
               <button className="btn-secondary w-full flex items-center justify-center gap-2" onClick={exportJSON}>
                 <Download className="w-4 h-4" />
                 Export as JSON
               </button>
+
               <button
                 className="btn-primary w-full flex items-center justify-center gap-2"
-                disabled={isPublishing || publishMutation.isPending}
+                disabled={isPublishing || publishMutation.isPending || isScheduling}
                 onClick={handlePublish}
               >
                 {isPublishing || publishMutation.isPending
                   ? <Loader2 className="w-4 h-4 animate-spin" />
                   : <Send className="w-4 h-4" />
                 }
-                Publish to Instagram
+                Publish Now
               </button>
+
+              <div className="pt-2 border-t border-dark-700 space-y-2">
+                <p className="text-[10px] font-bold text-dark-500 uppercase tracking-wider">Later</p>
+                <div className="flex gap-2">
+                  <input
+                    type="datetime-local"
+                    className="input-field flex-1 text-sm bg-dark-950"
+                    value={scheduleDate}
+                    onChange={(e) => setScheduleDate(e.target.value)}
+                  />
+                  <button
+                    className="btn-secondary flex items-center gap-2"
+                    disabled={!scheduleDate || isScheduling || isPublishing}
+                    onClick={handleSchedule}
+                  >
+                    {isScheduling ? <Loader2 className="w-4 h-4 animate-spin" /> : <Clock className="w-4 h-4" />}
+                    Schedule
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -481,8 +572,8 @@ export default function CarouselBuilder() {
         </div>
       </div>
 
-      {/* Hidden Export Container */}
-      <div style={{ position: 'absolute', top: '-9999px', left: '-9999px', pointerEvents: 'none', opacity: 0 }}>
+      {/* Hidden Export Container — keeping it in DOM but off-screen and visible for html-to-image stability */}
+      <div style={{ position: 'absolute', top: '-10000px', left: '-10000px', pointerEvents: 'none', visibility: 'visible' }}>
         {slides.map((slide, i) => (
           <div key={i} id={`slide-export-${i}`} style={{ width: '400px' }}>
             <SlidePreview slide={slide} template={selectedTemplate} />
