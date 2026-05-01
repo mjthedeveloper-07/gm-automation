@@ -1,74 +1,99 @@
-# React + TypeScript + Vite
+# GM Automation Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+GM Automation Dashboard is an open-source social media management tool designed to help you create, schedule, and analyze content effortlessly. With a modern interface and powerful features, anyone can use it to streamline their social media presence.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Interactive Dashboard:** Get a quick overview of your scheduled content and key metrics.
+- **Post Creation:** Easily draft and create posts.
+- **Carousel Builder:** Build engaging carousels visually and manage carousel assets.
+- **Analytics:** Track post performance and audience engagement.
+- **Post Queue:** View and manage your upcoming scheduled content.
+- **Trends Analysis:** Stay up to date with trending topics to optimize your content strategy.
+- **Admin & Settings:** Manage users, settings, and other configurations with dedicated admin panels.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS
+- **State Management & Data Fetching:** Zustand, React Query (@tanstack/react-query)
+- **Backend / Database:** Supabase (PostgreSQL, Auth, Storage)
+- **Serverless Functions:** Netlify Functions
+- **Other Tools:** Fabric.js (for canvas/carousel building), html-to-image, Recharts (for analytics), Lucide React (for icons)
 
-## Expanding the ESLint configuration
+## 📦 Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Before getting started, ensure you have the following installed:
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+- [npm](https://www.npmjs.com/) or another package manager
+- A [Supabase](https://supabase.com/) account and project
+- A [Netlify](https://www.netlify.com/) account (optional, for deployment)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## ⚙️ Local Development Setup
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd gm-automation
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Set up Environment Variables:**
+   Create a `.env` file in the root directory and add the following variables. You can find these in your Supabase project settings:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+   # For setup scripts (Database & Storage setup)
+   SUPABASE_URL=your_supabase_project_url
+   SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+   ```
+
+4. **Initialize Supabase Database and Storage:**
+   The project includes automated scripts to set up the database schema and storage buckets.
+
+   Run the database setup script to apply the schema (`supabase-schema.sql`):
+   ```bash
+   node setup-db.mjs
+   ```
+
+   Run the storage bucket setup script (creates the `carousel_assets` bucket):
+   ```bash
+   node setup-bucket.mjs
+   ```
+   *Alternatively, you can run the SQL from `supabase-schema.sql` directly in your Supabase Dashboard SQL Editor.*
+
+5. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+   *To run the dev server with Netlify CLI (useful if you are testing Netlify Functions locally):*
+   ```bash
+   npm run dev:netlify
+   ```
+
+## 🚀 Deployment
+
+This project is configured to be easily deployed on Netlify.
+
+You can build the project for production:
+```bash
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Or deploy directly using Netlify CLI:
+```bash
+npm run deploy
 ```
-# gm-automation
+Make sure to add your `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to your environment variables in the Netlify Dashboard.
+
+## 🤝 Contributing
+
+This is an open-source project! Feel free to submit issues, fork the repository, and open pull requests.
+
+## 📄 License
+
+This project is open-source and available for anyone to use.
