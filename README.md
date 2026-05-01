@@ -1,74 +1,42 @@
-# React + TypeScript + Vite
+# GM Automation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+GM Automation is a social media automation platform that helps you create, schedule, publish, and analyze AI-powered content across multiple platforms.
 
-Currently, two official plugins are available:
+## Updates & Highlights
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- AI post generation with tone, platform, and length controls
+- Caption + hashtag generator with trending hooks
+- Carousel builder with multiple templates and export/publish flow
+- Scheduling queue with status tracking and retry handling
+- Analytics dashboard with charts, platform breakdown, and cron status
+- Trend discovery from HackerNews, Dev.to, and GitHub
+- Secure admin control center with platform connections
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Multi-platform publishing (Instagram, X/Twitter, LinkedIn, Threads, Mastodon, Bluesky)
+- Queue management for scheduled and failed posts
+- Analytics for impressions, likes, comments, shares, and engagement rates
+- Built-in trend explorer to turn topics into posts quickly
+- Configurable AI provider fallback chain
+- Netlify scheduled functions for background automation
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Useful Scripts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev:netlify   # Run Netlify functions locally
+npm run lint          # Lint the codebase
+npm run build         # Build for production
+npm run preview       # Preview production build
 ```
-# gm-automation
+
+## Open Source
+
+GM Automation is open source and free to use by anyone. Feel free to fork, use, and contribute improvements.
